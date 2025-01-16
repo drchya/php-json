@@ -1,8 +1,6 @@
 
 # To-Do List Web Application (PHP & HTML)
 
-![To-Do List App](https://via.placeholder.com/600x300?text=To-Do+List+App)
-
 This is a simple To-Do List web application built using **PHP** and **HTML**. The app allows users to add tasks, store them in a **MySQL** database, and display them dynamically. Tasks are sent and retrieved from the database using a **Controller** and **Model** structure, with data formatted in **JSON** for easy communication between frontend and backend.
 
 ## Features

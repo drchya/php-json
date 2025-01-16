@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>To-Do List</title>
+</head>
+<body>
+    <h1>To-Do List</h1>
+    <form id="form-input">
+        <label>Task</label>
+        <input type="text" name="task">
+        <input type="submit" value="Submit">
+    </form>
+
+    <ul id="task-list"></ul>
+
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+    <script>
+        $("#form-input").on('submit', function(event) {
+            // Untuk Menghilangkan Reload Page dan setelah klik submit
+            event.preventDefault();
+            $.ajax({
+                url: 'TodoController.php',
+                type: 'POST',
+                data: $(this).serialize(),
+                success: function(response){
+                    $('#form-input')[0].reset(); // Reset form
+                    fetchTasks(); // Refresh task list
+                }
+            })
+        })
+
+        function fetchTasks() {
+            $.ajax({
+                url: 'TodoController.php',
+                type: 'GET',
+                success: function(response) {
+                    console.log("Response from server:", response);
+                    // Debug
+                    try {
+                        const tasks = JSON.parse(response);
+                        $('#task-list').empty();
+                        tasks.forEach(task => {
+                            $('#task-list').append(`
+                                <li>
+                                    ${task.task}
+                                    <button class="delete-task" data-id="${task.id}">Delete</button>
+                                </li>
+                            `);
+                        });
+
+                        // Event Listener Delete
+                        $(".delete-task").on('click', function() {
+                            const taskId = $(this).data('id');
+                            deleteTask(taskId);
+                        });
+                    } catch (error) {
+                        console.error("Error parsing JSON:", error);
+                    }
+                },
+                error: function(xhr, status, error) {
+                    console.error("AJAX Error:", error);
+                }
+            })
+        }
+
+        // Buat Function Delete
+        function deleteTask(taskId) {
+            $.ajax({
+                url: 'TodoController.php',
+                type: 'DELETE',
+                data: { id: taskId },
+                success: function (response) {
+                    fetchTasks();
+                },
+                error: function(xhr, status, error) {
+                    console.log("AJAX Error: ", error);
+                }
+            });
+        }
+
+        fetchTasks();
+        setInterval(fetchTasks, 5000);
+    </script>
+</body>
+</html>
